@@ -5,4 +5,4 @@
 
 客户端使用Unity C#制作
 
-服务端使用自己写的C++与Lua架构（https://github.com/FutureXXH/TCPOnlineGameServer）
+服务端使用自己写的C++与Lua架构（https://github.com/FutureXXH/TCPOnlineGameServer）  ,这里只放了Lua模块代码
