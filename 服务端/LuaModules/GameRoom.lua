@@ -74,7 +74,7 @@ local lasttime = ServerLuaLib.GetTime()/1000;
 local dtime = curtime-lasttime;
 local GameState = "WAIT";
 
-
+local GameRootType = 1;
 
 function GameRunTime()
     
@@ -88,9 +88,9 @@ function GameRunTime()
 
   elseif GameState ==  "Ready" then
     SendCurGameState(1)
-  --  PlayerMove()
+    ReadyGame()
     SendPlayerData()
-    GameState = "Runing"
+   
   elseif GameState ==  "Runing" then
     SendCurGameState(2)
     UpdatePlayerData()
@@ -114,18 +114,23 @@ end
 --在模块加载后调用 传入了模块ID号
 function OnInit(id)
     ID = id
-    print("[Lua]: GameRoom初始化成功  ID: "..ID)
+    ServerLuaLib.Log("INFO","[Lua]: GameRoom初始化成功  ID: "..ID)
+    ServerLuaLib.RegMessage(5000,ID);
     ServerLuaLib.RegMessage(5001,ID);
     ServerLuaLib.RegMessage(5002,ID);
     ServerLuaLib.RegMessage(5003,ID);
     ServerLuaLib.RegMessage(5004,ID);
     ServerLuaLib.RegMessage(5005,ID);
+    CMDS[5000] = GameRoomInitData_CMD;
     CMDS[5001] = JoinPlaye1_CMD;
     CMDS[5002] = ExitPlayer_CMD;
     CMDS[5003] = PlayerUpdateState_CMD;
     CMDS[5004] = PlayerAction_CMD;
     CMDS[5005] = Attack_CMD;
+    
 
+
+    GetRoomType();
 end
 
 --一直调用
@@ -167,6 +172,8 @@ function SendPlayerCount()
     end
 end
 
+
+
 function SendPlayerData()
     for k,v in pairs(RoomPlayerList) do
         for k2,v2 in pairs(RoomPlayerList) do
@@ -176,6 +183,29 @@ function SendPlayerData()
     end
 end
 
+function GetRoomType()
+    senddata = "";
+    ServerLuaLib.SendMessage(2007,senddata,ID,-1);
+end
+
+local ReadyTime = 10;
+function ReadyGame()
+    ReadyTime = ReadyTime-dtime;
+    for k,v in pairs(RoomPlayerList) do
+        local data = string.pack("i4i4i4i4",v.ID,507,4,math.floor(ReadyTime*100));
+        ServerLuaLib.SendMessage(10004,data,ID,-1);
+    end
+    if(ReadyTime <= 0) then
+        GameState = "Runing"
+    end
+
+end   
+
+function GameRoomInitData_CMD(data)
+    GameRootType =  string.unpack("i4",data);
+ 
+    
+end
 
 
 function JoinPlaye1_CMD(data)
@@ -209,6 +239,12 @@ function ExitPlayer_CMD(data)
         RoomPlayerList[PlayerID] = nil;
         CurPlayerCount = CurPlayerCount-1;
     end
+
+    if(GameState == "Runing") then
+        GameState = "End";
+    end
+
+
 end
 
 Checktime = 0
@@ -252,6 +288,10 @@ function PlayerAction_CMD(data)
              PlayerAction(PlayerID,CMD,5)
     elseif(CMD == 101)then
              PlayerAction(PlayerID,CMD,10)
+     elseif(CMD == 102)then
+            PlayerAction(PlayerID,CMD,10)
+    elseif(CMD == 103)then
+            PlayerAction(PlayerID,CMD,30)
      end
   
 end
@@ -294,25 +334,52 @@ function Attack_CMD(data)
 
   if(AttackID == 1)then
     RoomPlayerList[AimPlayerID].HP = RoomPlayerList[AimPlayerID].HP-2;
+  elseif (AttackID == 2) then
+   RoomPlayerList[AimPlayerID].HP = RoomPlayerList[AimPlayerID].HP-15;
   end
   
 
 
 end
 
-
+winID = -1
 function  GameOver()
-    local winID = -1;
-    for k,v in pairs(RoomPlayerList) do
+    if(winID == -1) then
+      for k,v in pairs(RoomPlayerList) do
        if(v.HP > 0) then
         winID = v.ID;
         break;
        end
       end
-
+      PlayerReward();
+    end
+     
 
       for k,v in pairs(RoomPlayerList) do
         local data = string.pack("i4i4i4i4",v.ID,506,4,winID);
         ServerLuaLib.SendMessage(10004,data,ID,-1);
       end
+end
+
+function PlayerReward()
+    for k,v in pairs(RoomPlayerList) do
+        if(GameRootType == 1) then
+            if(v.ID ~= winID)then
+                local data = string.pack("i4i4i4",v.ID,50,0);
+                ServerLuaLib.SendMessage(4011,data,ID,-1);
+            else
+                local data = string.pack("i4i4i4",v.ID,50+v.HP,0);
+                ServerLuaLib.SendMessage(4011,data,ID,-1);
+            end
+        else
+            if(v.ID ~= winID)then
+                local data = string.pack("i4i4i4",v.ID,50,-10);
+                ServerLuaLib.SendMessage(4011,data,ID,-1);
+            else
+                local data = string.pack("i4i4i4",v.ID,50+v.HP,10+math.floor(v.HP/10));
+                ServerLuaLib.SendMessage(4011,data,ID,-1);
+            end      
+
+        end
+       end
 end

@@ -26,6 +26,8 @@ function OnInit(id)
 
     ServerLuaLib.LoadNewModule(2000,"GameRoomManager.lua")
     ServerLuaLib.LoadNewModule(4000,"PlayerDataManager.lua")
+
+    ServerLuaLib.LoadNewModule(6000,"MatchSystem.lua")
 end
 
 --一直调用

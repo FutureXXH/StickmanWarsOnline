@@ -48,12 +48,14 @@ function OnInit(id)
     ServerLuaLib.RegMessage(2004,ID);
     ServerLuaLib.RegMessage(2005,ID);
     ServerLuaLib.RegMessage(2006,ID);
+    ServerLuaLib.RegMessage(2007,ID);
     CMDS[2001] = GetGameRoomList_CMD;
     CMDS[2002] = CreateGameRoom_CMD;
      CMDS[2003] = JoinGameRoom_CMD;
      CMDS[2004] = ExitGameRoom_CMD;
      CMDS[2005] = RemoveGameRoom_CMD;
      CMDS[2006] =  CreateMatchGameRoom_CMD
+     CMDS[2007] =   GetGameRoomType_CMD
 
 
 end
@@ -68,7 +70,7 @@ end
 function OnParseMessage(MessageID,data,srcModuleID)
    
    if CMDS[MessageID] ~= nil then
-    CMDS[MessageID](data);
+    CMDS[MessageID](data,srcModuleID);
    end
 end
 
@@ -108,16 +110,20 @@ function CreateGameRoom_CMD(data)
     GameRoomList[RoomID].RoomID = RoomID;
     GameRoomList[RoomID].state = 1;
     GameRoomList[RoomID].MaxPlayer = 2;
+    GameRoomList[RoomID].Type = 1;
     ServerLuaLib.Log("INFO","创建房间"..RoomID);
     ServerLuaLib.LoadNewModule(RoomID,"GameRoom.lua");
-   local sendData = string.pack("i4i4i4i4",playerID,202,4,RoomID);
+
+     
+
+    sendData = string.pack("i4i4i4i4",playerID,202,4,RoomID);
     ServerLuaLib.SendMessage(10004,sendData,ID,-1);
     return true
 end
 
 function CreateMatchGameRoom_CMD(data)
     local player1ID, player2ID = string.unpack("i4i4",data);
-    print(player1ID.."  "..player2ID)
+   -- print(player1ID.."  "..player2ID)
     local RoomID  = 0;
     for  tempi = 5000,5999  do
         if(GameRoomList[tempi] == nil) then 
@@ -136,6 +142,8 @@ function CreateMatchGameRoom_CMD(data)
     ServerLuaLib.Log("INFO","创建房间"..RoomID);
     ServerLuaLib.LoadNewModule(RoomID,"GameRoom.lua");
 
+
+
     local sendData = string.pack("i4i4i4i4",player1ID,202,4,RoomID);
     ServerLuaLib.SendMessage(10004,sendData,ID,-1);
     local sendData = string.pack("i4i4i4i4",player2ID,202,4,RoomID);
@@ -147,7 +155,10 @@ function CreateMatchGameRoom_CMD(data)
 end
 
 
-
+function GetGameRoomType_CMD(data,srcModuleID)
+    local sendData = string.pack("i4",GameRoomList[srcModuleID].Type);
+    ServerLuaLib.SendMessage(5000,sendData,ID,srcModuleID);
+end
 
 
 function JoinGameRoom_CMD(data)
