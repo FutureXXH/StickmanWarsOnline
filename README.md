@@ -26,7 +26,7 @@
 
 客户端使用Unity C#制作
 
-  unity包链接：https://pan.baidu.com/s/1DWK9CCZqjkuPWAaligxIFA?pwd=fuib 
+  unity包链接：https://pan.baidu.com/s/1_4GaK6mNKuO3HXP9AU4beg?pwd=o87h 
 
 服务端使用自己写的C++与Lua架构（https://github.com/FutureXXH/TCPOnlineGameServer ）,这里只放了Lua模块代码
 
