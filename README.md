@@ -30,9 +30,17 @@
 
 服务端使用自己写的C++与Lua架构（https://github.com/FutureXXH/TCPOnlineGameServer ）,这里只放了Lua模块代码
 
-## 早期截图
-![QQ截图20220521202353](https://user-images.githubusercontent.com/60800578/169651424-62225c61-614d-4734-9311-5b57f9d9afbf.png)
+## 截图
+
+![QQ截图20220522162522](https://user-images.githubusercontent.com/60800578/169685834-308cba0c-ddfd-4a1b-93b9-65820f9b43cc.png)
+
+![QQ截图20220522162548](https://user-images.githubusercontent.com/60800578/169685838-f5a45a67-37b0-4e9e-84e3-f782d145a55d.png)
+
+![QQ截图20220522162629](https://user-images.githubusercontent.com/60800578/169685843-3c0b17f0-dd47-436f-9276-1c7481d407fa.png)
+
+![QQ截图20220522162727](https://user-images.githubusercontent.com/60800578/169685847-49e0db1f-b2d6-49dd-b9b6-35c2721f627d.png)
 
 
 
-![QQ截图20220521203547](https://user-images.githubusercontent.com/60800578/169651755-d19429c9-8961-440c-ba1b-36503e94507b.png)
+
+
